@@ -1,11 +1,10 @@
 
-import Asymmetric.Ecc
+import Asymmetric.Rsa
 
 
 
-input
 
 
-if alg_input == "ecc":
-    cipher = ecc.encrypt()
-Ecc.encrypt(12)
+#
+cipher = Rsa.encrypt()
+#Ecc.encrypt(12)
