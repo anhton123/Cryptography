@@ -3,7 +3,7 @@ import Asymmetric.Ecc
 
 
 
-input
+print("random commit")
 
 
 if alg_input == "ecc":
