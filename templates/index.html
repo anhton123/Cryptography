@@ -1,5 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <p>Hello</p>
-    </head>
+{% extends "base.html" %}
+
+{% block title %}
+Cryptography Station
+{% endblock %}
+
+{% block main %}
+<body>
+    <h1>Hello Testeroni</h1>
+    <a href="/encrypt">Encrypt</a>
+    <a href="/h">Decrypt</a>
+</body>
+{% endblock %}
