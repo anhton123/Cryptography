@@ -1,4 +1,5 @@
-def encrypt(input, privkey=None, pubKey=None):
+
+def encrypt(input, privKey=None, pubKey=None):
     """SHA2 Hashing algorithim
 
     Args:
@@ -11,14 +12,15 @@ def encrypt(input, privkey=None, pubKey=None):
         str: returns the hash value of input using SHA2 hashing algorithim
     """
 
-    h0 = 0x6a09e667
-    h1 = 0xbb67ae85
-    h2 = 0x3c6ef372
-    h3 = 0xa54ff53a
-    h4 = 0x510e527f
-    h5 = 0x9b05688c
-    h6 = 0x1f83d9ab
-    h7 = 0x5be0cd19
+    # Some initialized constants
+    a = h0 = 0x6a09e667
+    b = h1 = 0xbb67ae85
+    c = h2 = 0x3c6ef372
+    d = h3 = 0xa54ff53a
+    e = h4 = 0x510e527f
+    f = h5 = 0x9b05688c
+    g = h6 = 0x1f83d9ab
+    h = h7 = 0x5be0cd19
 
     consts = "0x428a2f98 0x71374491 0xb5c0fbcf 0xe9b5dba5 0x3956c25b 0x59f111f1 0x923f82a4 0xab1c5ed5 " \
              "0xd807aa98 0x12835b01 0x243185be 0x550c7dc3 0x72be5d74 0x80deb1fe 0x9bdc06a7 0xc19bf174 " \
@@ -29,6 +31,7 @@ def encrypt(input, privkey=None, pubKey=None):
              "0x19a4c116 0x1e376c08 0x2748774c 0x34b0bcb5 0x391c0cb3 0x4ed8aa4a 0x5b9cca4f 0x682e6ff3" \
              "0x748f82ee 0x78a5636f 0x84c87814 0x8cc70208 0x90befffa 0xa4506ceb 0xbef9a3f7 0xc67178f2"
 
+    # Formatting the input message as well as padding
     bin_string = ''.join(format(ord(i), '08b') for i in input)
     original_length = len(bin_string)
 
@@ -43,8 +46,15 @@ def encrypt(input, privkey=None, pubKey=None):
 
     lst_consts = consts.split()
     eight_byte_list = create_message_schedule(byte_list)
+    eight_byte_list = process_messages(eight_byte_list)
 
-    pass
+    # Beginning the encryption
+
+
+    #for i in range(0, 64):
+
+
+
 
 def create_message_schedule(lst):
     new_list = []
@@ -58,4 +68,28 @@ def create_message_schedule(lst):
     for i in range(0, 48):
         new_list.append("00000000000000000000000000000000")
     return new_list
+
+def process_messages(eight_byte_list):
+    for i in range(16, 64):
+        rotated_s0one = bin(rotate_right(int(eight_byte_list[i - 15], 2), 7))[2:].zfill(32)
+        rotated_s0two = bin(rotate_right(int(eight_byte_list[i - 15], 2), 18))[2:].zfill(32)
+        right_shifts0 = bin(int(eight_byte_list[i-15], 2) >> 3)[2:].zfill(32)
+
+        rotated_s1one = bin(rotate_right(int(eight_byte_list[i - 2], 2), 17))[2:].zfill(32)
+        rotated_s1two = bin(rotate_right(int(eight_byte_list[i - 2], 2), 19))[2:].zfill(32)
+        right_shifts1 = bin(int(eight_byte_list[i - 2], 2) >> 10)[2:].zfill(32)
+
+        s0 = int(rotated_s0one, 2) ^ int(rotated_s0two, 2) ^ int(right_shifts0, 2)
+        s1 = int(rotated_s1one, 2) ^ int(rotated_s1two, 2) ^ int(right_shifts1, 2)
+
+        eight_byte_list[i] = bin(int(eight_byte_list[i-16], 2) + s0 + int(eight_byte_list[i-7], 2) + s1)[2:].zfill(32)
+    return eight_byte_list
+
+def rotate_right(x, n):
+    return int(f"{x:032b}"[-n:] + f"{x:032b}"[:-n], 2)
+
+
+value = input("Please input your text: ")
+encrypt(value)
+
 
