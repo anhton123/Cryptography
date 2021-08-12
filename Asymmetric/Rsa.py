@@ -1,3 +1,6 @@
+
+
+
 import random
 import ast
 
@@ -17,26 +20,6 @@ def is_prime(num):
             return False
     return True
 
-def get_p():
-    """Returns a valid number for prime number p
-    Returns:
-        int: returns a number that is prime
-    """
-    n = int(input("Please enter a prime number, p, where p is in the range of 23 <= p <= 97: "))
-    while is_prime(n) == False or n <= 22 or n >= 98:
-        n = int(input("{} is not a valid number, please enter another prime number between 23 and 97: ".format(n)))
-    return n
-
-def get_q():
-    """Returns a valid number for prime number q
-    Returns:
-        int: returns a number that is prime
-    """
-    n = int(input("Please enter a another prime number, q, where q is in the range 23 <= p <= 97: "))
-    while is_prime(n) == False:
-        n = int(input("{} is not a valid number, please enter another prime number between 23 and 97: ".format(n)))
-    return n
-
 def gcd(p,q):
     """Function to find the greatest common divisor of p and q
     Args:
@@ -45,6 +28,8 @@ def gcd(p,q):
     Returns:
         int: returns the greatest commond divisor of p and q
     """
+    if p <= 0 or q<= 0:
+        return 0
     while q != 0:
         p, q = q, p%q
     return p
@@ -59,6 +44,7 @@ def is_coprime(x, y):
         boolean: return true if x is coprime of y, return false if x isn't coprime of y
     """
     return gcd(x, y) == 1
+
 
 def get_e(phi, n):
     """Function to give a value to e, which is the value used in the encryption key
@@ -110,10 +96,6 @@ def generate_keyPairs(p, q):
     phi = (p-1) * (q-1)
     e = get_e(phi, n)
     d = get_d(phi, e)
-    # print("n = p*q = {}*{} = {}".format(p,q,n))
-    # print("phi = (p-1)*(q-1) = ({}-1)*({}-1) = {}".format(p,q,phi))
-    print("public key: (e, n) = ({}, {})".format(e,n))
-    print("private key: (d, n) = ({}, {})".format(d, n))
     return ((e,n),(d,n))
 
 def rsa_e(message, e, n):
@@ -125,6 +107,8 @@ def rsa_e(message, e, n):
     Returns:
         char: returns encrypted value of mesasge using encryption key
     """
+    if n <= 0:
+        return -1
     o = ord(message)
     cipher = ord(message) ** e % n
     return chr(cipher)
@@ -138,43 +122,40 @@ def rsa_d(cipher, d, n):
     Returns:
         char: returns decrypted value of cipher using decryption key
     """
-    o = ord(cipher)
+    if n <= 0:
+        return -1
     message = ord(cipher) ** d % n
     return chr(message)
-
-
+    
 def rsa_encrypt(txt, p, q):
     """Asymmetric RSA encryption algorithim
 
     Returns:
-        str: returns the cipher text of input using RSA encryption algorithim
+        tuple (string value of encrypted text, 
+               list of char values of encrypted txt, 
+               String representing key values): 
+               returns the cipher text of input using RSA encryption algorithim
     """
-    # inp = input("Please enter some text value to be encrypted (less than 50 characters): ")
-    # while len(inp) > 50:
-    #    inp = input("You entered more than 50 characters!\nPlease enter some text value to be encrypted (less than 50 characters): ") 
-    # 1. Gets two prime numbers p and q 
-    # p = get_p()
-    # q = get_q()
-    # 2. Generates private and public keys
+
     ((e,n),(d,n)) = generate_keyPairs(p, q)
-    # 3. Encryption
     cipher = []
     for char in txt:
         cipher.append(rsa_e(char, e, n))
-    # print("Your encrypted message: " + "".join(cipher) + " -")
-    # print("Copy this list if you want to decrypt it: " + str(cipher))
-    return (cipher, (d,n))
+    return ("".join(cipher), cipher,"Private Key: (d,n) = ({}, {})".format(d,n))
+
+def rsa_decrypt(cipher, d, n):
+    """Asymmetric RSA decryption algorithim
+    Args:
+        cipher(string): cipher to be decrypted
+        d (int):       value of d in decryption key
+        n (int):       the value of the multiplication between p and q
+    Returns:
+        str: returns the original text of input using RSA decryption algorithim
+    """
+    cipher = ast.literal_eval(cipher)
+    message = []
+    for char in cipher:
+        message.append(rsa_d(char, d, n))
+    return "".join(message)
 
 
-# if __name__ == "__main__":
-#     inp = input("Enter 'e' for encrypt, 'd' for decrypt, or 'q' for quit: ")
-#     while inp != 'q':
-#         if inp == 'e':
-#             encrypt()
-#             inp = input("Enter 'e' for encrypt, 'd' for decrypt, or 'q' for quit: ")
-#         elif inp == 'd':
-#             decrypt()
-#             inp = input("Enter 'e' for encrypt, 'd' for decrypt, or 'q' for quit: ")
-#         else:
-#             print("Wtf u just pressed")
-#             break
