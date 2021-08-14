@@ -1,16 +1,19 @@
+"""
+    Implementation for SHA256 hashing algorithm
+"""
+
 def sha2_hash(msg):
-    """SHA2 Hashing algorithim
+    """
+    SHA2 Hashing algorithm
 
     Args:
         msg (str): string data that is to be encrypted
 
-
-
     Returns:
-        str: returns the hash value of input using SHA2 hashing algorithim
+        str: returns the hash value of input using SHA256 hashing algorithim
     """
 
-
+    # Some constants
     h0 = hextobin('0x6a09e667')
     h1 = hextobin('0xbb67ae85')
     h2 = hextobin('0x3c6ef372')
@@ -29,13 +32,12 @@ def sha2_hash(msg):
               '0x19a4c116', '0x1e376c08', '0x2748774c', '0x34b0bcb5', '0x391c0cb3', '0x4ed8aa4a', '0x5b9cca4f', '0x682e6ff3',
               '0x748f82ee', '0x78a5636f', '0x84c87814', '0x8cc70208', '0x90befffa', '0xa4506ceb', '0xbef9a3f7', '0xc67178f2')
 
+    # Processes the msg into 32 bit words
     binary_list = pre_processing(msg)
     binary_list = create_message_schedule(binary_list)
     binary_list = process_messages(binary_list)
 
     # Beginning the encryption
-    # B94D27B9934D3E08A52E52D7DA7DABFAC484EFE37A5380EE9088F7ACE2EFCDE9
-
     a = h0
     b = h1
     c = h2
@@ -48,13 +50,13 @@ def sha2_hash(msg):
     for i in range(64):
         s1 = xor(right_rotate(e, 6), right_rotate(e, 11))
         s1 = xor(s1, right_rotate(e, 25))
-        ch = xor(add(e, f), add(complement(e), g))
+        ch = xor(bin_and(e, f), bin_and(complement(e), g))
         temp1 = bin_add(h, s1, ch, hextobin(consts[i]), binary_list[i])[-32:]
 
         s0 = xor(right_rotate(a, 2), right_rotate(a, 13))
         s0 = xor(s0, right_rotate(a, 22))[-32:]
-        maj = xor(add(a, b), add(a, c))
-        maj = xor(maj, add(b, c))[-32:]
+        maj = xor(bin_and(a, b), bin_and(a, c))
+        maj = xor(maj, bin_and(b, c))[-32:]
         temp2 = bin_add(s0, maj)[-32:]
 
         h = g
@@ -77,8 +79,17 @@ def sha2_hash(msg):
 
     return hex(int((h0 + h1 + h2 + h3 + h4 + h5 + h6 + h7), 2))[2:].upper()
 
-# Formatting the input message as well as padding
 def pre_processing(msg):
+    """
+    Formatting the input message as well as padding
+
+    Args:
+        msg (str): The input
+
+    Returns:
+        The msg padded in the right format as a list
+
+    """
     bin_string = ''.join(format(ord(i), '08b') for i in msg)
     original_length = len(bin_string)
 
@@ -93,8 +104,17 @@ def pre_processing(msg):
     return binary_list
 
 
-# The messaging scheduler. Condenses the messages into 32 bit words.
 def create_message_schedule(lst):
+    """
+    The messaging scheduler. Condenses the messages into 32 bit words.
+
+    Args:
+        lst (list): A list of the message in binary
+
+    Returns:
+        The input but condensed into 32 bit words
+
+    """
     new_list = []
     string = ""
     for val in lst:
@@ -105,8 +125,17 @@ def create_message_schedule(lst):
     new_list.extend(["00000000000000000000000000000000" for i in range(48)])
     return new_list
 
-# Processes the messages
 def process_messages(input_list):
+    """
+    Processes the messages
+
+    Args:
+        input_list (list): The 32 bit word list
+
+    Returns:
+        list: The input_list with its elements encrypted
+
+    """
     for i in range(16, 64):
         rotated_s0one = right_rotate(input_list[i - 15], 7)
         rotated_s0two = right_rotate(input_list[i - 15], 18)
@@ -125,9 +154,29 @@ def process_messages(input_list):
     return input_list
 
 def hextobin(h):
+    """
+    Hex to binary function
+
+    Args:
+        h (): A hexadecimal number
+
+    Returns:
+        The input but in binary
+
+    """
     return bin(int(h, 16))[2:].zfill(32)
 
 def xor(binstring1, binstring2):
+    """
+    XOR function for binary strings
+    Args:
+        binstring1 (string): A binary number represented in string format
+        binstring2 (string): A binary number represented in string format
+
+    Returns:
+        The two inputs XOR together
+
+    """
     binary_return = ''
     for i in range(32):
         if (binstring1[i] == '1' and binstring2[i] == '0') or (binstring1[i] == '0' and binstring2[i] == '1'):
@@ -136,7 +185,18 @@ def xor(binstring1, binstring2):
             binary_return += '0'
     return binary_return
 
-def add(binstring1, binstring2):
+def bin_and(binstring1, binstring2):
+    """
+    AND function for binary strings
+
+    Args:
+        binstring1 (string): A binary number represented in string format
+        binstring2 (string): A binary number represented in string format
+
+    Returns:
+        The two inputs added together
+
+    """
     binary_return = ''
     for i in range(32):
         if binstring1[i] == '1' and binstring2[i] == '1':
@@ -146,6 +206,16 @@ def add(binstring1, binstring2):
     return binary_return
 
 def complement(binstring):
+    """
+    Complement for binary strings
+
+    Args:
+        binstring (string): A binary number represented in string format
+
+    Returns:
+        The input's complement
+
+    """
     binary_return = ''
     for i in range(32):
         if binstring[i] == '1':
@@ -155,20 +225,46 @@ def complement(binstring):
     return binary_return
 
 def bin_add(*bin_nums: str) -> str:
+    """
+    Addition for binary numbers
+
+    Args:
+        *bin_nums (): Values to be added
+
+    Returns:
+        The sum of all the values
+
+    """
     return bin(sum(int(x, 2) for x in bin_nums))[2:].zfill(32)
 
-# shifts to the right by num
 def right_shift(binstring, num):
+    """
+    shifts to the right by num
+
+    Args:
+        binstring (): A binary number represented in string format
+        num (): The shifting value
+
+    Returns:
+        The binary number shifted the correct amount
+
+    """
     return binstring[:-num].zfill(32)
 
-# Function to rotate string to the right by num
 def right_rotate(binstring, num):
+    """
+    Function to rotate string to the right by num
+
+    Args:
+        binstring (): A binary number represented in string format
+        num (): The number to rotate by
+
+    Returns:
+        The binary number rotated the correct amount
+
+    """
     rotation = binstring[-num:]
     original = binstring[:-num]
     return (rotation + original).zfill(32)
 
-print(sha2_hash('hello world'))
 
-# value = input("Please input your text: ")
-# print('Here is your encrypted message')
-# print(encrypt(value))
