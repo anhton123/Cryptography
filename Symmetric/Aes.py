@@ -348,7 +348,7 @@ def get_key_iv(password, salt, workload=100000):
     iv = stretched[:IV_SIZE]
     return aes_key, hmac_key, iv
 
-def aes_encrypt(key, plaintext,workload=100000):
+def encrypt(key, plaintext, workload=100000):
     """
     Encrypts `plaintext` with `key` using AES-128, an HMAC to verify integrity,
     and PBKDF2 to stretch the given key.
@@ -369,20 +369,20 @@ def aes_encrypt(key, plaintext,workload=100000):
     return (hmac + salt + ciphertext).hex()
 
 
-def aes_decrypt(key, ct, workload=100000): #
+def decrypt(key, ct, workload=100000):
     """
     Decrypts `ciphertext` with `key` using AES-128, an HMAC to verify integrity,
     and PBKDF2 to stretch the given key.
     The exact algorithm is specified in the module docstring.
     """
 
-    assert len(ct) % 16 == 0, "Ciphertext must be made of full 16-byte blocks."
-
-    assert len(ct) >= 32, """
-    Ciphertext must be at least 32 bytes long (16 byte salt + 16 byte block). To
-    encrypt or decrypt single blocks use `AES(key).decrypt_block(ciphertext)`.
-    """
-    ciphertext = bytes.fromhex(ct)
+    if(len(ct) % 16 != 0 or len(ct) < 32):
+        return "Ciphertext must be made of full 16-byte blocks and greater than 32 bytes long"
+    # assert len(ct) % 16 == 0, "Ciphertext must be made of full 16-byte blocks."
+    try:
+        ciphertext = bytes.fromhex(ct)
+    except:
+        return "Ciphertext must conatin all hexadecimal values"
     if isinstance(key, str):
         key = key.encode('utf-8')
 
@@ -399,5 +399,32 @@ def aes_decrypt(key, ct, workload=100000): #
     return str(AES(key).decrypt_cbc(ciphertext, iv))[2:len(str(AES(key).decrypt_cbc(ciphertext, iv)))-1]
 
 
-print(aes_encrypt("abcdefghijklmnop", "Anhton is the coolest person on the face of the planet earth"))
-print(aes_decrypt("abcdefghijklmnop", "0b491ec6122145a12aff93d81ecc45d6e13615a189ab0a82bf426fdb3742b54d67fae9b82643898e977415b94e04fa09f49f5a39ed7839c9f8a3587b93e575d2c377a68bee203b5618c42e862813bb664e50a60a7e1bdfe97c229e13ae5680ca4e31a42dc9671aa447134bea52d52d9c"))
+print(encrypt("abcdefhijklmnopqrstuvwxyzhellomynameisdaniel", "anthon is my besfriend and he is the leader of the cyrtop project"))
+print(decrypt("abcdefhijklmnopqrstuvwxyzhellomynameisdaniel", "zf32fc5198fcb0336ae3ec1b3e04a15e11da20ee5c3ee691242555589014c5ea077875190dc7195ffbfbe8b55cceb08f46de94131649a0535ae94290a912c6bef82224a530a0f051ede518369e4e2626d4b91f9128f82178bedee4c9688ad7b174e40ea75dc56132ca8d9fb8edf4907b95a8ead38ec6078fac7cdc196c514500"))
+# print(_expand_key([1, 2, 3, 4, 5, 6, 7, 8, 9, 0, [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]]))
+
+# def encrypt(input, key):
+#     """Symmetric AES encryption algorithim
+
+#     Args:
+#         input (str): string data that is to be encrypted
+#         privKey (str): no use of private key. defaulted to None
+#         pubKey (str): public key used for encryption
+
+#     Returns:
+#         str: returns the cipher text of input using AES encryption algorithim
+#     """
+#     pass
+
+# def decrypt(input, key):
+#     """Symmetric AES decryption algorithim
+
+#     Args:
+#         input (str): string data that is to be encrypted
+#         privKey (str): no use of private key. defaulted to None
+#         pubKey (str): public key used for decryption
+
+#     Returns:
+#         str: returns the original text of input using AES decryption algorithim
+#     """
+#     pass

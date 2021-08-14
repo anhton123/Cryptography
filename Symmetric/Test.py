@@ -75,10 +75,10 @@ def leftRotate(c, d, roundN):
             second argument: 28-bit string of input arg d after left rotating for its current round
     """
     roundLeftShift = [1,1,2,2,2,2,2,2,1,2,2,2,2,2,2,1]
-    n_shift = roundLeftShift[roundN - 1]
+    n_shift = roundLeftShift[roundN]
     tempBinString1 = c[n_shift:] + c[:n_shift]
     tempBinString2 = d[n_shift:] + d[:n_shift]
-    return tempBinString1 + tempBinString2
+    return (tempBinString1, tempBinString2)
 
 def pc2(c, d):
     """Permutes the 56 bit key into a 48 bit key
@@ -132,7 +132,7 @@ def messageSplitHalf(binString):
     """Splits the 64 bit message from current round into two halves
 
     Arguments:
-        binString(str): The 64 bit message from the previous round
+        binString(str): The 64 bit message after initial permutation
 
     Return:
         tuple(str, str): 
@@ -145,6 +145,14 @@ def messageSplitHalf(binString):
     return (l,r)
 
 def expansionPermutation(r):
+    """Expands the 32 bit message to 48 bits for the current round 
+
+    Arguments:
+        r(str): The right half 32 bit message from previous round
+
+    Return:
+        str: 48 bit expanded binary string
+    """
     eVector = [32,   1,   2,   3,   4,   5,
                 4,   5,   6,   7,   8,   9,
                 8,   9,  10,  11,  12,  13,
@@ -158,10 +166,16 @@ def expansionPermutation(r):
         expansionBinString += r[num-1]
     return expansionBinString
 
-def getLeftRight(L, R, K):
-    pass
-
 def xor(binString1, binString2):
+    """Does xor operation on the input args 
+
+    Arguments:
+        binString1(str): first binary string to have xor operation
+        binString2(str): second binary string to have xor operation
+
+    Return:
+        str: binary string of binString1 xor binString2
+    """ 
     binaryReturn = ""
     for i in range(len(binString1)):
         if (binString1[i] == "1" and binString2[i] == "0") or (binString1[i] == "0" and binString2[i] == "1"):
@@ -171,11 +185,29 @@ def xor(binString1, binString2):
     return binaryReturn
 
 def sBoxParser(binString):
+    """Helper function for "sBox()" function. Parses appropriate values for row and columns. 
+
+    Arguments:
+        binString(str): 6 bit binary string
+
+    Return:
+        tuple(int, int): 
+            first argument: row value to be used for sbox vector
+            second argument: column value to be used for sbox vector
+    """
     row = binString[0] + binString[5]
     col = binString[1:5]
     return (binaryToDecimal(row), binaryToDecimal(col))
 
 def sBox(binString):
+    """Applies sbox algorithim to input arg binString 
+
+    Arguments:
+        binString(str): 48 bit binary string
+
+    Return:
+        str: 48 bit binary string after sbox algorithim
+    """
     sbox = [[[14, 4, 13, 1, 2, 15, 11, 8, 3, 10, 6, 12, 5, 9, 0,  7],
             [ 0, 15, 7, 4, 14, 2, 13, 1, 10, 6, 12, 11, 9, 5, 3, 8],
             [ 4, 1, 14, 8, 13, 6, 2, 11, 15, 12, 9, 7, 3, 10, 5, 0],
@@ -224,6 +256,14 @@ def sBox(binString):
     return returnBinString
 
 def permuteAfterSBox(binString):
+    """Returns a 32 bit binary permuted binary string of 32 bit message (meant to be used after sbox)
+
+    Arguments:
+        binString(str): 32 bit binary value
+
+    Return:
+        str: 32 bit binary value
+    """
     permuteVector = [16,   7,  20,  21,
                      29,  12,  28,  17,
                       1,  15,  23,  26,
@@ -237,28 +277,95 @@ def permuteAfterSBox(binString):
         purmuteBinString += binString[num-1]
     return purmuteBinString
 
-def f(R, K):
+def eff(R, K):
+    """Returns 32 bit binary value after applying the function f in DES encryption
+
+    Arguments:
+        R(str): 32 bit binary which is the right half of message for the previous round
+        K(str): 48 bit binary which is the key for the current round
+
+    Return:
+        str: 32 bit binary after performation "eff" function
+    """
     E = expansionPermutation(R)
-    #print("Status on E: "  + str(E == "011110100001010101010101011110100001010101010101"))
     KE = xor(E, K)
-    #print("Status on K xor E: "  + str(KE == "011000010001011110111010100001100110010100100111"))
     S = sBox(KE)
-    #print("Status on sBox on K xor E: " + str(S == "01011100100000101011010110010111"))
     f = permuteAfterSBox(S)
-    #print("Status on permutation of sBox of K xor E: " + str(f == "00100011010010101010100110111011"))
     return f
 
-def des_encrypt(message, key):
+def getR(L, R, K):
+    """Returns 32 bit binary value after computing f xor L
+
+    Arguments:
+        L(str): 32 bit binary which is the left half of message for the previous round
+        R(str): 32 bit binary which is the right half of message for the previous round
+        K(str): 48 bit binary which is the key for the current round
+
+    Return:
+        str: 32 bit binary after performation "eff" function
+    """
+    f = ""
+    f = eff(R, K)
+    R = xor(L, f)
+    return R
+
+def finalPermutation(binString):
+    """Returns a permuted binary string of 64 bit message after applying rounds
+
+    Arguments:
+        binString(str): 64 bit binary value after applying the "rounds" section of DES
+
+    Return:
+        str: 64 bit permuted message
+    """    
+    finalPermutationVectorTable = [40,     8,   48,    16,    56,   24,    64,   32,
+                                   39,     7,   47,    15,    55,   23,    63,   31,
+                                   38,     6,   46,    14,    54,   22,    62,   30,
+                                   37,     5,   45,    13,    53,   21,    61,   29,
+                                   36,     4,   44,    12,    52,   20,    60,   28,
+                                   35,     3,   43,    11,    51,   19,    59,   27,
+                                   34,     2,   42,    10,    50,   18,    58,   26,
+                                   33,     1,   41,     9,    49,   17,    57,   25]
+    purmuteBinString = ""
+    for num in finalPermutationVectorTable:
+        purmuteBinString += binString[num-1]
+    return purmuteBinString
+
+def des_encrypt(key, message):
+    """Applies DES algorithim with given 8 character key and 8 character message
+
+    Arguments:
+        key(str): 8 character key used for encryption/decryption
+        message(str): 8 character message to be encrypted
+
+    Return:
+        str: 16 digit hex value for the encrypted message
+    """
     message = textToBinary(message)
     key = textToBinary(key)
-    # 1. Initial Permutation
+    # 1. Initial Permutation for message and key
     permutedMsg = initialPermutation(message)
     permutedKey = pc1(key)
+    # 2. Splitting permutted message and key
+    (C, D) = keySplitHalf(permutedKey)
+    (L, R) = messageSplitHalf(permutedMsg)
     # 2. Rounds
     for round in range(16):
         # This code deals with key for current round
-        (C, D) = keySplitHalf(permutedKey)
-        permutedKey = leftRotate(C, D, round)
-        permutedKey = pc2(permutedKey)
+        (C, D) = leftRotate(C, D, round)
+        key = pc2(C, D)
         # This code deals with message for current round
-        (L, R) = messageSplitHalf(permute)
+        tempR = getR(L, R, key)
+        L = R
+        R = tempR
+    # 3. Bit Swapping
+    binString = R + L
+    # 4. Inverse Initial Permutation
+    cipher = finalPermutation(binString)
+    return hex(int(cipher,2))[2:]
+
+def des_decrypt(key, cipher):
+    pass
+
+#print(des_encrypt("0001001100110100010101110111100110011011101111001101111111110001","0000000100100011010001010110011110001001101010111100110111101111"))
+print(des_encrypt("ABCDEFGH", "HelloWor"))
