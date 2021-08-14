@@ -397,34 +397,3 @@ def decrypt(key, ct, workload=100000):
 
     # return AES(key).decrypt_cbc(ciphertext, iv)
     return str(AES(key).decrypt_cbc(ciphertext, iv))[2:len(str(AES(key).decrypt_cbc(ciphertext, iv)))-1]
-
-
-print(encrypt("abcdefhijklmnopqrstuvwxyzhellomynameisdaniel", "anthon is my besfriend and he is the leader of the cyrtop project"))
-print(decrypt("abcdefhijklmnopqrstuvwxyzhellomynameisdaniel", "8b7b6d6accad2bb7b4b4c60dbbd914bda7ac58952def2cedc5dc7cba1f12868699548e45427b73e486b28157eda2cb6d8d31d00d544e4ca7cabe83f609ee807e18b2f6c8b1b8080bf46776091e1c999f63030a57b8635f866ede8b242b0c313005925df9f2f52595284446e10a08c03a3265ca7eb04f389264813bcddf80dabd"))
-# print(_expand_key([1, 2, 3, 4, 5, 6, 7, 8, 9, 0, [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]]))
-
-# def encrypt(input, key):
-#     """Symmetric AES encryption algorithim
-
-#     Args:
-#         input (str): string data that is to be encrypted
-#         privKey (str): no use of private key. defaulted to None
-#         pubKey (str): public key used for encryption
-
-#     Returns:
-#         str: returns the cipher text of input using AES encryption algorithim
-#     """
-#     pass
-
-# def decrypt(input, key):
-#     """Symmetric AES decryption algorithim
-
-#     Args:
-#         input (str): string data that is to be encrypted
-#         privKey (str): no use of private key. defaulted to None
-#         pubKey (str): public key used for decryption
-
-#     Returns:
-#         str: returns the original text of input using AES decryption algorithim
-#     """
-#     pass
