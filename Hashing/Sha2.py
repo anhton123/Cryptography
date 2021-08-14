@@ -1,17 +1,16 @@
-
-def encrypt(msg, privkey=None, pubkey=None):
+def sha2_hash(msg):
     """SHA2 Hashing algorithim
 
     Args:
         msg (str): string data that is to be encrypted
-        privkey (str): no private key. defaulted to None
-        pubkey (str): no public key. defaulted to None
+
 
 
     Returns:
         str: returns the hash value of input using SHA2 hashing algorithim
     """
-    # Some initialized constants
+
+
     h0 = hextobin('0x6a09e667')
     h1 = hextobin('0xbb67ae85')
     h2 = hextobin('0x3c6ef372')
@@ -168,11 +167,8 @@ def right_rotate(binstring, num):
     original = binstring[:-num]
     return (rotation + original).zfill(32)
 
-# Helper function that right rotates values
-def rotate_right(val, rotate_num):
-    return int(f"{val:032b}"[-rotate_num:] + f"{val:032b}"[:-rotate_num], 2)
-
+print(sha2_hash('hello world'))
 
 # value = input("Please input your text: ")
-value = 'hello world'
-print(encrypt(value))
+# print('Here is your encrypted message')
+# print(encrypt(value))
