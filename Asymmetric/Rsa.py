@@ -1,6 +1,3 @@
-
-
-
 import random
 import ast
 
@@ -129,14 +126,12 @@ def rsa_d(cipher, d, n):
     
 def rsa_encrypt(txt, p, q):
     """Asymmetric RSA encryption algorithim
-
     Returns:
         tuple (string value of encrypted text, 
                list of char values of encrypted txt, 
-               String representing key values): 
+               String displaying Private key values): 
                returns the cipher text of input using RSA encryption algorithim
     """
-
     ((e,n),(d,n)) = generate_keyPairs(p, q)
     cipher = []
     for char in txt:
@@ -146,7 +141,7 @@ def rsa_encrypt(txt, p, q):
 def rsa_decrypt(cipher, d, n):
     """Asymmetric RSA decryption algorithim
     Args:
-        cipher(string): cipher to be decrypted
+        cipher(string): string value of a list whose elements are the chars of the encrypted text
         d (int):       value of d in decryption key
         n (int):       the value of the multiplication between p and q
     Returns:
