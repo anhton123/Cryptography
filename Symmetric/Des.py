@@ -13,14 +13,81 @@ def textToBinary(text):
     return ''.join(bin(ord(c)) for c in text).replace('b','')
 
 def binaryToDecimal(binString):
+    """Returns the decimal value of the binary string that is passed in as input
+
+    Arguments:
+        binString(str): binaryString that will be converted to decimal
+
+    Return:
+        int: decimal value of binary string
+    """
     return int(binString, 2)
 
 def decimalToBinary(num):
+    """Returns the binary value of the decimal number that is passed in
+
+    Arguments:
+        num(int): number to be converted to binary
+
+    Return:
+        str: binary string representation of decimal converted to binary
+    """
     return bin(num)[2:]
 
 def padd4(binString):
+    """Adds 0's at the front of the binary string so that the total length is 4
+
+    Arguments:
+        binString(str): binaryString that is to be padded
+
+    Return:
+        str: 4 bit binary string
+    """
     padd = (4 - len(binString)) * "0"
     return padd + binString
+
+def hexToBinary(hex):
+    """Converts hex string to binary string
+
+    Arguments:
+        hex(str): hex string
+
+    Return:
+        str: binary string reprsentation of hex string
+    """
+    ret = ""
+    for h in hex:
+        ret += padd4(bin(int(h, 16))[2:])
+    return ret
+
+def chunk8(binString):
+    """Divides up binary string into a list where each element contains 8 elements of binary string
+
+    Arguments:
+        binString(str): binaryString that is to be chunked
+
+    Return:
+        list (str): list of binary strings each element in length 8
+    """
+    chunk = []
+    for i in range(0, len(binString), 8):
+        chunk.append(binString[i:i+8])
+    return chunk
+
+def binaryToAscii(binString):
+    """Converts binary string to appropriate ascii value
+
+    Arguments:
+        binString(str): binaryString that is to be converted to ascii
+
+    Return:
+        str: ascii value of binString
+    """
+    chunk = chunk8(binString)
+    plainText = ""
+    for c in chunk:
+        plainText += chr(int(c, 2))
+    return plainText
 
 ############## Key #####################
 def pc1(binString):
@@ -331,8 +398,26 @@ def finalPermutation(binString):
         purmuteBinString += binString[num-1]
     return purmuteBinString
 
+def generateDecryptionKey(key):
+    """Generates the decryption keys for each round of decryption
+
+    Arguments:
+        key(str): original key of user
+
+    Return:
+        str: 48 key used for current round of decryption
+    """
+    keys = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    permutedKey = pc1(key)
+    (C, D) = keySplitHalf(permutedKey)
+    for round in range(16):
+        (C, D) = leftRotate(C, D, round)
+        key = pc2(C, D)
+        keys[15 - round] = key
+    return keys
+
 def des_encrypt(key, message):
-    """Applies DES algorithim with given 8 character key and 8 character message
+    """Applies DES encryption algorithim with given 8 character key and 8 character message
 
     Arguments:
         key(str): 8 character key used for encryption/decryption
@@ -365,7 +450,36 @@ def des_encrypt(key, message):
     return hex(int(cipher,2))[2:]
 
 def des_decrypt(key, cipher):
-    pass
+    """Applies DES decryption algorithim with given 8 character key and 8 character message
 
-#print(des_encrypt("0001001100110100010101110111100110011011101111001101111111110001","0000000100100011010001010110011110001001101010111100110111101111"))
-print(des_encrypt("ABCDEFGH", "HelloWor"))
+    Arguments:
+        key(str): 8 character key used for encryption/decryption
+        cipher(str): 16 digit hex value from encrypted message
+
+    Return:
+        str: 8 character plain text
+    """
+    cipher = hexToBinary((cipher))
+    key = textToBinary(key)
+    keys = generateDecryptionKey(key)
+    # 1. Initial Permutation for cipher and key
+    permutedCipher = initialPermutation(cipher)
+    permutedKey = pc1(key)
+    # 2. Splitting permutted cipher and key
+    (C, D) = keySplitHalf(permutedKey)
+    (L, R) = messageSplitHalf(permutedCipher)
+    # 2. Rounds
+    for round in range(16):
+        # This code deals with key for current round
+        key = keys[round]
+        # This code deals with cipher for current round
+        tempR = getR(L, R, key)
+        L = R
+        R = tempR
+    # 3. Bit Swapping
+    binString = R + L
+    # 4. Inverse Initial Permutation
+    cipher = finalPermutation(binString)
+    # 5. Plaintext
+    return binaryToAscii(cipher)
+
