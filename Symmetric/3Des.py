@@ -1,25 +1,17 @@
-def encrypt(input, privKey, pubKey):
-    """Symmetric 3DES encryption algorithim
+def xor(binString1, binString2):
+    binaryReturn = ""
+    for i in range(len(binString1)):
+        if (binString1[i] == 1 and binString2[i] == 0) or (binString1[i] == 0 and binString2[i] == 1):
+            binaryReturn += "1"
+        else:
+            binaryReturn += "0"
+    return binaryReturn
 
-    Args:
-        input (str): string data that is to be encrypted
-        privKey (str): no use of private key. defaulted to None
-        pubKey (str): public key used for encryption
-
-    Returns:
-        str: returns the cipher text of input using 3DES encryption algorithim
-    """
-    pass
-
-def decrypt(input, privKey, pubKey):
-    """Symmetric 3DES decryption algorithim
-
-    Args:
-        input (str): string data that is to be encrypted
-        privKey (str): no use of private key. defaulted to None
-        pubKey (str): public key used for decryption
-
-    Returns:
-        str: returns the original text of input using 3DES decryption algorithim
-    """
-    pass
+def add(binString1, binString2):
+    binaryReturn = ""
+    carry = False
+    for i in range(len(binString1) - 1, -1, -1):
+        if binString1[i] == "1" and binString2[i] == "1":
+            carry = True
+        if carry == True:
+            
