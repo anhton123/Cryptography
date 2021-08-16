@@ -154,3 +154,5 @@ def rsa_decrypt(cipher, d, n):
     return "".join(message)
 
 
+print(rsa_encrypt("hello", 23, 23))
+print(rsa_decrypt("['Ĵ', 'Ŝ', 'Ƌ', 'Ƌ', 'Ǌ']", 1641, 529))

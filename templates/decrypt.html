@@ -1,1 +1,54 @@
 {% extends "base.html" %}
+{% block main %}
+
+<script src="/static/openSesame.js"></script>
+
+<body>
+    <br>
+    <div>
+        <button type="button" class="btn btn-primary" onclick="openSesame(1)">RSA</button>
+        <button type="button" class="btn btn-primary" onclick="openSesame(2)">AES</button>
+        <button type="button" class="btn btn-primary" onclick="openSesame(3)">DES</button>
+    </div>
+
+    <!-- RSA -->
+    <div style = "Visibility = hidden">
+        <form id="1" action="/decrypt" method="POST" style="display: none">
+            <input type="hidden" name="type" value="RSA">
+            <label for= "txt">Text:</label><br>
+            <input type= "text" name= "txt" required minlength = "1" maxlength = "50"><br>
+            <label for="d">D:</label><br>
+            <input type= "number" name = "d" required><br>
+            <label for="n">N:</label><br>
+            <input type= "number" name = "n" required><br>
+            <button class="btn btn-primary" type="submit" name="RSA">Decrypt!</button>
+        </form>
+    </div>
+
+    <!-- AES -->
+    <div style = "Visibility = hidden">
+        <form id="2" action="/decrypt" method="POST" style="display: none">
+            <input type="hidden" name="type" value="AES">
+            <label for= "key">Key:</label><br>
+            <input type= "text" name= "key" required><br>
+            <label for="txt">Text:</label><br>
+            <input type= "text" name = "txt" required><br>
+            <button class="btn btn-primary" type="submit">Decrypt!</button>
+        </form>
+    </div>
+
+    <!-- DES -->
+    <div style = "Visibility = hidden">
+        <form id="3" action="/decrypt" method="POST" style="display: none">
+            <input type="hidden" name="type" value="DES">
+            <label for= "key">Key: </label><br>
+            <input type= "text" name= "key" required placeholder="8 characters"><br>
+            <label for="txt">Text:</label><br>
+            <input type= "text" name = "txt" required placeholder="8 characters"><br>
+            <button class="btn btn-primary" type="submit">Decrypt!</button>
+        </form>
+    </div>
+
+</body>
+
+{% endblock %}

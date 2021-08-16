@@ -1,15 +1,77 @@
 {% extends "base.html" %}
 {% block main %}
-<style>
-    h1 {text-align: center;}
-    p {text-align: center;}
-    div {text-align: center;}
-    textarea {text-align: center}
-</style>
+
+
+<!-- Hides second form until encryption method is selected -->
+<script src="/static/openSesame.js"> </script>
 <body>
-    <div>{{ d }}</div>
-    <div>{{ n }}</div>
-    <div><textarea> {{ c }} </textarea></div>
-    <div><textarea> {{ w }} </textarea></div>
+    <br>
+    <div>
+        <button type="button" class="btn btn-primary" onclick="openSesame(1)">RSA</button>
+        <button type="button" class="btn btn-primary" onclick="openSesame(2)">AES</button>
+        <button type="button" class="btn btn-primary" onclick="openSesame(3)">DES</button>
+        <button type="button" class="btn btn-primary" onclick="openSesame(4)">MD5</button>
+        <button type="button" class="btn btn-primary" onclick="openSesame(5)">SHA</button>
+    </div>
+
+    <!-- RSA -->
+    <div style = "Visibility = hidden">
+        <form id="1" action="/encrypt" method="POST" style="display: none">
+            <input type="hidden" name="type" value="RSA">
+            <label for= "txt">Input:</label><br>
+            <input type= "text" name= "txt" required minlength = "1" maxlength = "50"><br>
+            <label for="p">P: (prime number between 23 and 97)</label><br>
+            <input type= "number" name = "p" required><br>
+            <label for="q">Q: (prime number between 23 and 97)</label><br>
+            <input type= "number" name = "q" required><br>
+            <button class="btn btn-primary" type="submit" name="RSA">Encrypt!</button>
+        </form>
+    </div>
+
+    <!-- AES -->
+    <div style = "Visibility = hidden">
+        <form id="2" action="/encrypt" method="POST" style="display: none">
+            <input type="hidden" name="type" value="AES">
+            <label for="key">Key: (under 32 characters)</label><br>
+            <input type="text" name="key" required minlength = "1" maxlength = "32"><br>
+            <label for="txt">Text:</label><br>
+            <input type="text" name="txt" required minlength = "1" maxlength = "50"><br>
+            
+            <button class="btn btn-primary" type="submit">Encrypt!</button>
+        </form>
+    </div>
+
+    <!-- DES -->
+    <div style = "Visibility = hidden">
+        <form id="3" name="DES" action="/encrypt" method="POST" style="display: none">
+            <input type="hidden" name="type" value="DES">
+            <label for="key">Key: 8 Characters</label><br>
+            <input type="text" name="key" required minlength = "8" maxlength = "8"><br>
+            <label for="txt">Message: 8 Characters</label><br>
+            <input type="text" name="txt" required minlength = "8" maxlength = "8"><br>
+            <button class="btn btn-primary" type="submit">Encrypt!</button>
+        </form>
+    </div>
+
+    <!-- MD5 -->
+    <div style = "Visibility = hidden">
+        <form id="4" action="/encrypt" method="POST" style="display: none">
+            <input type="hidden" name="type" value="MD5">
+            <label for="txt">Input:</label><br>
+            <input type="text" name="txt"><br>
+            <button class="btn btn-primary" type="submit">Encrypt!</button>
+        </form>
+    </div>
+
+    <!-- SHA -->
+    <div style = "Visibility = hidden">
+        <form id="5" action="/encrypt" method="POST" style="display: none">
+            <input type="hidden" name="type" value="SHA">
+            <label for="txt">Input:</label><br>
+            <input type="text" name="txt"><br>
+            <button class="btn btn-primary" type="submit">Encrypt!</button>
+        </form>
+    </div>
+
 </body>
 {% endblock %}

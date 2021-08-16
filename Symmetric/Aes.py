@@ -348,7 +348,7 @@ def get_key_iv(password, salt, workload=100000):
     iv = stretched[:IV_SIZE]
     return aes_key, hmac_key, iv
 
-def encrypt(key, plaintext, workload=100000):
+def aes_encrypt(key, plaintext, workload=100000):
     """
     Encrypts `plaintext` with `key` using AES-128, an HMAC to verify integrity,
     and PBKDF2 to stretch the given key.
@@ -369,7 +369,7 @@ def encrypt(key, plaintext, workload=100000):
     return (hmac + salt + ciphertext).hex()
 
 
-def decrypt(key, ct, workload=100000):
+def aes_decrypt(key, ct, workload=100000):
     """
     Decrypts `ciphertext` with `key` using AES-128, an HMAC to verify integrity,
     and PBKDF2 to stretch the given key.
@@ -399,8 +399,8 @@ def decrypt(key, ct, workload=100000):
     return str(AES(key).decrypt_cbc(ciphertext, iv))[2:len(str(AES(key).decrypt_cbc(ciphertext, iv)))-1]
 
 
-print(encrypt("abcdefhijklmnopqrstuvwxyzhellomynameisdaniel", "anthon is my besfriend and he is the leader of the cyrtop project"))
-print(decrypt("abcdefhijklmnopqrstuvwxyzhellomynameisdaniel", "8b7b6d6accad2bb7b4b4c60dbbd914bda7ac58952def2cedc5dc7cba1f12868699548e45427b73e486b28157eda2cb6d8d31d00d544e4ca7cabe83f609ee807e18b2f6c8b1b8080bf46776091e1c999f63030a57b8635f866ede8b242b0c313005925df9f2f52595284446e10a08c03a3265ca7eb04f389264813bcddf80dabd"))
+# print(encrypt("abcdefhijklmnopqrstuvwxyzhellomynameisdaniel", "anthon is my besfriend and he is the leader of the cyrtop project"))
+# print(decrypt("abcdefhijklmnopqrstuvwxyzhellomynameisdaniel", "8b7b6d6accad2bb7b4b4c60dbbd914bda7ac58952def2cedc5dc7cba1f12868699548e45427b73e486b28157eda2cb6d8d31d00d544e4ca7cabe83f609ee807e18b2f6c8b1b8080bf46776091e1c999f63030a57b8635f866ede8b242b0c313005925df9f2f52595284446e10a08c03a3265ca7eb04f389264813bcddf80dabd"))
 # print(_expand_key([1, 2, 3, 4, 5, 6, 7, 8, 9, 0, [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]]))
 
 # def encrypt(input, key):
